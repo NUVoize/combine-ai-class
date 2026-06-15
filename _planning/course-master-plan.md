@@ -73,7 +73,7 @@ Plus: the course intro ("Before You Start"), which sets tone and positioning.
 **Module 1A, The Model Landscape**
 - 1.1 The three kinds of models: generation, edit, and hybrid (the distinction everyone confuses)
 - 1.2 Tour of the cloud tools and how each one actually works
-- 1.3 Why model choice matters for a given task
+- 1.3 Picking your approach: there is no do-it-all model (the end goal dictates model AND technique; know each model's blind spot)
 
 **Module 1B, Prompting Against Character Drift**
 - 1.4 Prompting for identity: what text can and cannot carry (callback to 0.5)
@@ -154,6 +154,8 @@ Plus: the course intro ("Before You Start"), which sets tone and positioning.
 ## Cross-cutting threads (not their own modules)
 
 **Credibility / positioning.** Two years of testing, close to a thousand LoRAs trained across all models. This is not a lesson, it is the reason to trust the course. It lives in marketing copy and is woven into lessons as "here is what we learned the hard way so you can skip it," never as a standalone module.
+
+**No do-it-all model (the approach matches the goal).** There is no single model that does everything. The end goal, the target look (hyperreal "real person" vs cinematic vs stylized), plus the scene, the length, and the type of action, dictates not just the model but the technique. Strong generalists carry most work, but every model has a blind spot, so mastery means commanding several models and knowing where each one fails. Introduced head-on in Lesson 1.3, reinforced in the model-family lessons (2.2 local, 3.2 video), and present throughout as "match the tool to the job." This is the practical core of the course's "no magic button" stance.
 
 **One-on-one support.** Promised in the intro. Policy: included in the **top tier** as a baseline. Also available **a la carte** to anyone, but at full price with no bundle discount, so the pricing itself nudges people toward the top tier. Top-tier members who want extra one-on-one beyond what is included get a reduced rate. Exact included hours, session counts, and prices: TBD.
 

@@ -1,7 +1,15 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import TubesBackground from './components/neon-flow'
+import Classes from './Classes'
 
 export default function App() {
+  const [hash, setHash] = useState(() => window.location.hash)
+  useEffect(() => {
+    const onHash = () => setHash(window.location.hash)
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -60,6 +68,8 @@ export default function App() {
     return () => cancelAnimationFrame(raf)
   }, [])
 
+  if (hash === '#classes') return <Classes />
+
   return (
     <>
       <div className="cb-bgbase" />
@@ -71,6 +81,7 @@ export default function App() {
             <a href="#problem">The problem</a>
             <a href="#levels">Levels</a>
             <a href="#approach">Approach</a>
+            <a href="#classes">Classes</a>
             <a href="#start" className="cb-btn cb-btn-primary">Start free</a>
           </div>
         </div>
@@ -191,7 +202,7 @@ export default function App() {
           <div className="cb-eyebrow cb-reveal">Start where it's free</div>
           <h2 className="cb-reveal">Foundations costs nothing and changes how you see every tool after it.</h2>
           <p className="cb-lead cb-reveal" style={{ marginLeft: 'auto', marginRight: 'auto' }}>Five short lessons on why the same character is so hard to get twice. Once it clicks, every technique in the course makes sense.</p>
-          <a href="#" className="cb-btn cb-btn-primary cb-reveal">Start the free foundations</a>
+          <a href="#classes" className="cb-btn cb-btn-primary cb-reveal">Start the free foundations</a>
         </div>
       </section>
 
