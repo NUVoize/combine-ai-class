@@ -120,12 +120,12 @@ export default function App() {
             <div className="cb-card cb-bad cb-reveal">
               <div className="cb-tag">Prompt only</div>
               <div className="cb-cap">The face wanders every render.</div>
-              <div className="cb-grid"><div className="cb-slot">[FILL: drift 1]</div><div className="cb-slot">[FILL: drift 2]</div><div className="cb-slot">[FILL: drift 3]</div><div className="cb-slot">[FILL: drift 4]</div></div>
+              <div className="cb-grid"><img src="/demo/drift-1.jpg" alt="Prompt-only attempt, drifted face 1" /><img src="/demo/drift-2.jpg" alt="Prompt-only attempt, drifted face 2" /><img src="/demo/drift-3.jpg" alt="Prompt-only attempt, drifted face 3" /><img src="/demo/drift-4.jpg" alt="Prompt-only attempt, drifted face 4" /></div>
             </div>
             <div className="cb-card cb-good cb-reveal">
               <div className="cb-tag">The COMBINE workflow</div>
               <div className="cb-cap">One identity, any scene.</div>
-              <div className="cb-grid"><div className="cb-slot">[FILL: locked 1]</div><div className="cb-slot">[FILL: locked 2]</div><div className="cb-slot">[FILL: locked 3]</div><div className="cb-slot">[FILL: locked 4]</div></div>
+              <div className="cb-grid cb-grid2"><img src="/demo/locked-1.jpg" alt="Same character, scene 1" /><img src="/demo/locked-2.jpg" alt="Same character, scene 2" /></div>
             </div>
           </div>
         </div>
