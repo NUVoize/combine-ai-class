@@ -4,6 +4,7 @@ import cors from 'cors';
 import { config } from './config';
 import { getUserId } from './auth';
 import { getTier, consumeUsage, refundUsage } from './entitlements';
+import { ensureSchema } from './db';
 import { clientForContent } from './llm';
 import { runPipeline } from './core/engine';
 import { getProfile, MODELS } from './core/registry';
@@ -75,6 +76,14 @@ app.post('/api/prompt-helper/generate', async (req: Request, res: Response) => {
   }
 });
 
-app.listen(config.port, () => {
-  console.log(`prompt-helper server listening on :${config.port}`);
-});
+// Create tables if needed, then start listening.
+ensureSchema()
+  .then(() => {
+    app.listen(config.port, () => {
+      console.log(`prompt-helper server listening on :${config.port}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Schema init failed, not starting:', err);
+    process.exit(1);
+  });
