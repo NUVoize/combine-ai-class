@@ -24,7 +24,7 @@ export interface RunOptions {
 }
 
 // Tolerant JSON array extraction: strips code fences and grabs the outermost [ ... ].
-function extractJsonArray<T>(text: string): T {
+export function extractJsonArray<T>(text: string): T {
   const cleaned = text.replace(/```json/gi, '').replace(/```/g, '').trim();
   const start = cleaned.indexOf('[');
   const end = cleaned.lastIndexOf(']');

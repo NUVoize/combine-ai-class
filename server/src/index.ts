@@ -6,7 +6,7 @@ import { getUserId } from './auth';
 import { getTier, consumeUsage, refundUsage } from './entitlements';
 import { ensureSchema } from './db';
 import { clientForContent } from './llm';
-import { runPipeline } from './core/engine';
+import { runPipeline, extractJsonArray } from './core/engine';
 import { getProfile, MODELS } from './core/registry';
 import type { ContentMode, GenerationMode } from './core/types';
 
@@ -72,6 +72,47 @@ app.post('/api/prompt-helper/generate', async (req: Request, res: Response) => {
     await refundUsage(userId, tier); // a failed call should not cost a credit
     const message = err instanceof Error ? err.message : 'Generation failed.';
     console.error('[generate] error:', message);
+    res.status(502).json({ error: message });
+  }
+});
+
+app.post('/api/prompt-helper/caption', async (req: Request, res: Response) => {
+  const userId = getUserId(req);
+  if (!userId) return res.status(401).json({ error: 'Not authenticated.' });
+
+  const { content, image } = req.body ?? {};
+  if (content !== 'sfw' && content !== 'nsfw') return res.status(400).json({ error: 'content must be sfw or nsfw.' });
+  if (!image || typeof image.data !== 'string' || typeof image.mimeType !== 'string') {
+    return res.status(400).json({ error: 'image { data, mimeType } is required.' });
+  }
+
+  const tier = await getTier(userId);
+  const meter = await consumeUsage(userId, tier);
+  if (!meter.allowed) {
+    if (tier === 'none') return res.status(403).json({ error: 'No active plan includes the prompt helper.' });
+    return res.status(429).json({ error: 'Daily limit reached for your plan.', used: meter.used, cap: meter.cap });
+  }
+
+  try {
+    const client = clientForContent(content as ContentMode);
+    const system = content === 'nsfw'
+      ? 'You look at an image and write vivid, explicit scene descriptions usable as a generation prompt. Use direct, anatomically correct language.'
+      : 'You look at an image and write vivid, concise scene descriptions usable as a generation prompt.';
+    const out = await client.complete({
+      system,
+      prompt: 'Return 3 short scene descriptions of this image (one sentence each, roughly 12 to 25 words) as a JSON array of strings. JSON only, no preamble.',
+      temperature: 0.7,
+      json: true,
+      maxTokens: 600,
+      images: [{ data: image.data, mimeType: image.mimeType }],
+    });
+    const captions = extractJsonArray<string[]>(out);
+    if (!Array.isArray(captions)) throw new Error('Captioning did not return a list.');
+    res.json({ captions, usage: { tier: meter.tier, used: meter.used, cap: meter.cap } });
+  } catch (err) {
+    await refundUsage(userId, tier);
+    const message = err instanceof Error ? err.message : 'Captioning failed.';
+    console.error('[caption] error:', message);
     res.status(502).json({ error: message });
   }
 });
