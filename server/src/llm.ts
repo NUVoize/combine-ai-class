@@ -1,4 +1,4 @@
-import { config, assertNsfwConfigured } from './config';
+import { config, assertNsfwConfigured, assertSfwConfigured } from './config';
 import { anthropicClient, lmStudioClient, type ModelClient } from './core/clients';
 import type { ContentMode } from './core/types';
 
@@ -13,5 +13,6 @@ export function clientForContent(content: ContentMode): ModelClient {
       apiKey: config.lmStudio.apiKey,
     });
   }
+  assertSfwConfigured();
   return anthropicClient({ apiKey: config.anthropic.apiKey, model: config.anthropic.model });
 }

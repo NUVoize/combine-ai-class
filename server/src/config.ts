@@ -32,7 +32,7 @@ export const config = {
 
   // SFW path: Anthropic, your key.
   anthropic: {
-    apiKey: req('ANTHROPIC_API_KEY'),
+    apiKey: opt('ANTHROPIC_API_KEY', ''), // checked at call time, so the service boots without it
     model: opt('ANTHROPIC_MODEL', 'claude-sonnet-4-6'),
   },
 
@@ -47,5 +47,11 @@ export const config = {
 export function assertNsfwConfigured() {
   if (!config.lmStudio.baseUrl || !config.lmStudio.model) {
     throw new Error('NSFW requested but LMSTUDIO_BASE_URL / LMSTUDIO_MODEL are not set.');
+  }
+}
+
+export function assertSfwConfigured() {
+  if (!config.anthropic.apiKey) {
+    throw new Error('SFW requested but ANTHROPIC_API_KEY is not set.');
   }
 }
