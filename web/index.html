@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>COMBINE // AI Character Creation, Done Properly</title>
+<meta name="description" content="The no-gimmick course on AI character creation. Why consistency is hard, then every real way to beat it." />
+<link rel="icon" href="assets/combine-mark.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#08080c; --surface:#0e0e16; --ink:#f2f2f7; --muted:#9a9ab2;
+    --violet:#7c1aff; --blue:#0a84ff; --line:#20202c;
+    --grad:linear-gradient(100deg,#7c1aff,#0a84ff);
+    --display:'Space Grotesk',sans-serif; --body:'Inter',sans-serif;
+    --maxw:1200px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3{font-family:var(--display);font-weight:700;line-height:.95;letter-spacing:-.02em;text-transform:uppercase}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 26px}
+  .eyebrow{font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.34em;text-transform:uppercase;color:var(--muted)}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  #bgbase{position:fixed;inset:0;z-index:0;pointer-events:none;background:var(--bg);overflow:hidden}
+  #bgbase::before,#bgbase::after{content:'';position:absolute;width:75vmax;height:75vmax;border-radius:50%;filter:blur(90px);opacity:.55}
+  #bgbase::before{background:radial-gradient(circle,rgba(124,26,255,.55),transparent 60%);top:-22vmax;right:-12vmax;animation:drift1 24s ease-in-out infinite alternate}
+  #bgbase::after{background:radial-gradient(circle,rgba(10,132,255,.5),transparent 60%);bottom:-22vmax;left:-12vmax;animation:drift2 30s ease-in-out infinite alternate}
+  @keyframes drift1{from{transform:translate(0,0) scale(1)}to{transform:translate(-13vmax,15vmax) scale(1.28)}}
+  @keyframes drift2{from{transform:translate(0,0) scale(1)}to{transform:translate(15vmax,-13vmax) scale(1.22)}}
+  .reveal{opacity:0;transform:translateY(26px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+  .btn{display:inline-block;font-family:var(--display);font-weight:600;font-size:14px;text-transform:uppercase;letter-spacing:.06em;padding:15px 26px;border:2px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;transition:background .12s linear,color .12s linear,border-color .12s linear}
+  .btn-primary{background:var(--grad);border-color:transparent;color:#fff}
+  .btn-primary:hover{filter:brightness(1.12)}
+  .btn-ghost:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+  /* nav */
+  nav{position:fixed;top:0;left:0;right:0;z-index:30;background:rgba(8,8,12,.6);backdrop-filter:blur(12px);border-bottom:2px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:66px}
+  nav img{height:28px;display:block}
+  nav .links{display:flex;gap:28px;align-items:center}
+  nav .links a:not(.btn){font-family:var(--display);font-weight:500;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);transition:color .12s}
+  nav .links a:not(.btn):hover{color:var(--ink)}
+  nav .links .btn{padding:9px 16px}
+  @media(max-width:860px){nav .links a:not(.btn){display:none}}
+</style>
+</head>
+<body id="top">
+<div id="bgbase"></div>
+<style>
+  /* hero */
+  header.hero{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:120px 0 0;overflow:hidden}
+  .herofx-wrap{position:absolute;inset:0;z-index:0;overflow:hidden}
+  #herofx,.herofx-img{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .herofx-img{object-fit:cover;object-position:70% center;display:none}
+  .herofx-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(8,8,12,.95),rgba(8,8,12,.6) 46%,rgba(8,8,12,.22)),linear-gradient(0deg,rgba(8,8,12,.85),transparent 38%)}
+  .hero .wrap{position:relative;z-index:3;width:100%}
+  .hero h1{font-size:clamp(46px,10.5vw,128px);font-weight:700;letter-spacing:-.03em;line-height:.9}
+  .hero h1 .rotor{display:inline-block}
+  .hero p.sub{margin-top:28px;font-size:clamp(16px,2vw,20px);color:var(--muted);max-width:48ch}
+  .hero .cta{margin-top:36px;display:flex;gap:12px;flex-wrap:wrap}
+  .hero .placeholder-tag{position:absolute;bottom:96px;right:26px;z-index:3;font-family:var(--display);font-weight:600;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);border:2px solid var(--line);padding:6px 10px;background:rgba(8,8,12,.5)}
+  @media(max-width:760px){.hero .placeholder-tag{display:none}}
+  /* marquee */
+  .marquee{position:relative;z-index:3;margin-top:64px;border-top:2px solid var(--line);border-bottom:2px solid var(--line);overflow:hidden;white-space:nowrap;background:rgba(8,8,12,.5)}
+  .marquee .track{display:inline-block;padding:14px 0;animation:scroll 28s linear infinite;font-family:var(--display);font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.12em}
+  .marquee .track span{color:var(--muted)}
+  .marquee .track i{color:var(--violet);font-style:normal;padding:0 18px}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  /* sections */
+  section{position:relative;z-index:2;padding:120px 0;border-top:2px solid var(--line);background:transparent}
+  section h2{font-size:clamp(30px,5.2vw,60px);max-width:18ch;margin-top:16px}
+  section .lead{margin-top:22px;font-size:18px;color:var(--muted);max-width:58ch}
+  /* before/after */
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:56px;border:2px solid var(--line)}
+  @media(max-width:760px){.ba{grid-template-columns:1fr}}
+  .ba .card{padding:26px;border-right:2px solid var(--line)}
+  .ba .card:last-child{border-right:none}
+  @media(max-width:760px){.ba .card{border-right:none;border-bottom:2px solid var(--line)}.ba .card:last-child{border-bottom:none}}
+  .ba .tag{font-family:var(--display);font-weight:700;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+  .ba .bad .tag{color:#ff6b6b}.ba .good .tag{color:#39d98a}
+  .ba .cap{margin-top:8px;font-family:var(--display);font-weight:600;font-size:20px;text-transform:uppercase}
+  .ba .grid{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .ba .slot{aspect-ratio:1;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;padding:8px}
+  .ba .good .slot{border-color:rgba(57,217,138,.35)}
+  /* levels */
+  .levels{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;border:2px solid var(--line)}
+  @media(max-width:980px){.levels{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.levels{grid-template-columns:1fr}}
+  .lvl{position:relative;padding:30px 24px;border-right:2px solid var(--line);min-height:300px;display:flex;flex-direction:column;transition:background .12s linear,color .12s linear}
+  .lvl:last-child{border-right:none}
+  @media(max-width:980px){.lvl:nth-child(2){border-right:none}.lvl:nth-child(1),.lvl:nth-child(2){border-bottom:2px solid var(--line)}}
+  @media(max-width:560px){.lvl{border-right:none;border-bottom:2px solid var(--line)}.lvl:last-child{border-bottom:none}}
+  .lvl .num{font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.2em;color:var(--muted);transition:color .12s linear}
+  .lvl h3{font-size:26px;margin-top:12px}
+  .lvl .price{margin-top:10px;font-family:var(--display);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);transition:color .12s linear}
+  .lvl p{margin-top:16px;font-size:14px;color:var(--muted);flex:1;transition:color .12s linear}
+  .lvl .free-price{color:#39d98a}
+  .lvl:hover{background:var(--grad);color:#fff}
+  .lvl:hover .num,.lvl:hover .price,.lvl:hover p{color:#fff}
+  .lvl .ribbon{position:absolute;top:0;right:0;font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:5px 10px;background:var(--grad);color:#fff}
+  .lvl:hover .ribbon{background:#08080c}
+  /* honesty */
+  .honest{text-align:center}
+  .honest .big{font-family:var(--display);font-weight:700;text-transform:uppercase;font-size:clamp(26px,4.6vw,52px);line-height:1.02;letter-spacing:-.02em;max-width:16ch;margin:18px auto 0}
+  .proof{display:flex;flex-wrap:wrap;justify-content:center;gap:0;margin-top:48px;border:2px solid var(--line)}
+  .proof .chip{font-family:var(--display);font-weight:500;font-size:13px;text-transform:uppercase;letter-spacing:.06em;padding:16px 22px;border-right:2px solid var(--line);flex:1 1 auto;white-space:nowrap}
+  .proof .chip:last-child{border-right:none}
+  .proof .chip b{font-weight:700;color:var(--violet)}
+  @media(max-width:680px){.proof{flex-direction:column}.proof .chip{border-right:none;border-bottom:2px solid var(--line)}.proof .chip:last-child{border-bottom:none}}
+  /* final + footer */
+  .final{text-align:center}.final h2{margin:16px auto 0;max-width:20ch}.final p{margin:20px auto 0}.final .btn{margin-top:34px}
+  footer{position:relative;z-index:2;border-top:2px solid var(--line);padding:42px 0;background:var(--bg)}
+  footer .wrap{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  footer img{height:24px}
+  footer .fine{font-family:var(--display);font-weight:500;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  :focus-visible{outline:2px solid var(--violet);outline-offset:3px}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}#herofx{display:none}.herofx-img{display:block}.marquee .track{animation:none}#bgbase::before,#bgbase::after{animation:none}html{scroll-behavior:auto}}
+</style>
+
+<nav>
+  <div class="wrap">
+    <a href="#top"><img src="assets/combine-lockup-dark.png" alt="COMBINE" /></a>
+    <div class="links">
+      <a href="#problem">The problem</a>
+      <a href="#levels">Levels</a>
+      <a href="#approach">Approach</a>
+      <a href="#start" class="btn btn-primary">Start free</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="herofx-wrap">
+    <canvas id="herofx"></canvas>
+    <img class="herofx-img" src="assets/hero-image.png" alt="" aria-hidden="true" />
+  </div>
+  <div class="herofx-scrim"></div>
+  <div class="placeholder-tag">Placeholder image // swap for COMBINE character art</div>
+  <div class="wrap">
+    <div class="eyebrow reveal">AI Education &nbsp;//&nbsp; Visuals &nbsp;//&nbsp; Growth</div>
+    <h1 class="reveal" style="margin-top:20px">Make the same<br />character,<br /><span class="rotor grad" id="rotor">every scene.</span></h1>
+    <p class="sub reveal">COMBINE is the no-gimmick course on AI character creation. Why consistency is hard, then every real way to beat it, from accessible online tools to training your own models.</p>
+    <div class="cta reveal">
+      <a href="#start" class="btn btn-primary">Start with the free foundations</a>
+      <a href="#levels" class="btn btn-ghost">See the four levels</a>
+    </div>
+  </div>
+  <div class="marquee reveal">
+    <div class="track">
+      <span>No magic button</span><i>/</i><span>Real workflows</span><i>/</i><span>~1,000 LoRAs tested</span><i>/</i><span>Zero drift</span><i>/</i><span>We show the failures</span><i>/</i><span>No magic button</span><i>/</i><span>Real workflows</span><i>/</i><span>~1,000 LoRAs tested</span><i>/</i><span>Zero drift</span><i>/</i><span>We show the failures</span><i>/</i>
+    </div>
+  </div>
+</header>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="eyebrow reveal">Why this is hard</div>
+    <h2 class="reveal">Character drift isn't your fault. It's how the models work.</h2>
+    <p class="lead reveal">An image model has no memory, and it builds every picture from scratch. Your words can't carry a whole face, so it fills the gaps differently each time and hands you a new person. Beating that is a skill, and it's the skill this course teaches.</p>
+    <div class="ba">
+      <div class="card bad reveal">
+        <div class="tag">Prompt only</div>
+        <div class="cap">The face wanders every render.</div>
+        <div class="grid"><div class="slot">[FILL: drift face 1]</div><div class="slot">[FILL: drift face 2]</div><div class="slot">[FILL: drift face 3]</div><div class="slot">[FILL: drift face 4]</div></div>
+      </div>
+      <div class="card good reveal">
+        <div class="tag">The COMBINE workflow</div>
+        <div class="cap">One identity, any scene.</div>
+        <div class="grid"><div class="slot">[FILL: locked, scene 1]</div><div class="slot">[FILL: locked, scene 2]</div><div class="slot">[FILL: locked, scene 3]</div><div class="slot">[FILL: locked, scene 4]</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="levels">
+  <div class="wrap">
+    <div class="eyebrow reveal">Four levels, stacked</div>
+    <h2 class="reveal">Buy a level, get a complete skill. Nothing half-locked.</h2>
+    <p class="lead reveal">Each level is a finished, usable outcome on its own. Higher levels include everything beneath them, and advanced material never leaks into the simpler tiers.</p>
+    <div class="levels">
+      <div class="lvl reveal">
+        <div class="num">00</div><h3>Foundations</h3><div class="price free-price">Free</div>
+        <p>Why consistency is hard, and the ideas everything else is built on. No software, no hardware, just the mental model that makes the rest click.</p>
+      </div>
+      <div class="lvl reveal">
+        <div class="ribbon">Start here</div><div class="num">01</div><h3>Cloud Path</h3><div class="price">Price TBD</div>
+        <p>The accessible road. Online tools, text-to-image and image-to-image, and prompting to hold a character against drift. Its limits stated up front.</p>
+      </div>
+      <div class="lvl reveal">
+        <div class="num">02</div><h3>Local Path</h3><div class="price">Price TBD</div>
+        <p>Full control. Local models, real training datasets, and building your own LoRAs, with the judgment to know which tool fits which job.</p>
+      </div>
+      <div class="lvl reveal">
+        <div class="num">03</div><h3>Video</h3><div class="price">Coming soon</div>
+        <p>The same character, now in motion. Everything you learned, extended frame to frame.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="approach">
+  <div class="wrap honest">
+    <div class="eyebrow reveal">No magic button</div>
+    <div class="big reveal">If you want one secret prompt that does it all, this isn't for you. If you want to actually understand it, it is.</div>
+    <div class="proof">
+      <div class="chip reveal"><b>2 years</b> of testing</div>
+      <div class="chip reveal">close to <b>1,000 LoRAs</b></div>
+      <div class="chip reveal">we show the <b>failures</b></div>
+      <div class="chip reveal"><b>one-on-one</b> in the top tier</div>
+    </div>
+  </div>
+</section>
+
+<section id="start">
+  <div class="wrap final">
+    <div class="eyebrow reveal">Start where it's free</div>
+    <h2 class="reveal">Foundations costs nothing and changes how you see every tool after it.</h2>
+    <p class="lead reveal" style="margin-left:auto;margin-right:auto">Five short lessons on why the same character is so hard to get twice. Once it clicks, every technique in the course makes sense.</p>
+    <a href="#" class="btn btn-primary reveal">Start the free foundations</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <img src="assets/combine-lockup-dark.png" alt="COMBINE" />
+    <div class="fine">COMBINE &middot; AI Education, Visuals, Growth &middot; Preview</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var small = window.innerWidth < 760;
+  var canvas = document.getElementById('herofx');
+  var fallbackImg = document.querySelector('.herofx-img');
+  var gl = (!reduce && !small && canvas) ? (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) : null;
+  if(!gl){ if(canvas) canvas.style.display='none'; if(fallbackImg) fallbackImg.style.display='block'; return; }
+
+  var vs = 'attribute vec2 p; varying vec2 vUv; void main(){ vUv = p*0.5+0.5; gl_Position = vec4(p,0.0,1.0); }';
+  var fs = [
+    'precision highp float; varying vec2 vUv;',
+    'uniform sampler2D uImage; uniform sampler2D uDepth;',
+    'uniform vec2 uPointer; uniform float uProgress; uniform float uImgA; uniform float uCanA;',
+    'float hash(vec2 p){ return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }',
+    'vec2 cover(vec2 uv){ vec2 o=uv;',
+    ' if(uCanA>uImgA){ o.y=(uv.y-0.5)*(uImgA/uCanA)+0.5; } else { o.x=(uv.x-0.5)*(uCanA/uImgA)+0.5; } o=(o-0.5)*0.85+0.5; return o; }',
+    'void main(){',
+    ' vec2 uv=cover(vUv);',
+    ' float dep=texture2D(uDepth,uv).r;',
+    ' vec2 uv2=uv+dep*uPointer*0.06;',
+    ' vec3 base=texture2D(uImage,uv2).rgb;',
+    ' float d=texture2D(uDepth,uv2).r;',
+    ' vec2 tUv=vec2(vUv.x*uCanA,vUv.y); float tiling=70.0;',
+    ' vec2 tiled=mod(tUv*tiling,2.0)-1.0;',
+    ' float bright=hash(floor(tUv*tiling*0.5));',
+    ' float dist=length(tiled);',
+    ' float dt=smoothstep(0.5,0.49,dist)*bright;',
+    ' float flow=1.0-smoothstep(0.0,0.06,abs(d-uProgress));',
+    ' vec3 scanCol=mix(vec3(0.49,0.10,1.0),vec3(0.04,0.52,1.0),vUv.x);',
+    ' vec3 mask=clamp(dt*flow*scanCol*6.5,0.0,1.0);',
+    ' vec3 final=1.0-(1.0-base)*(1.0-mask);',
+    ' gl_FragColor=vec4(final,1.0);',
+    '}'
+  ].join('\n');
+
+  function sh(t,s){ var o=gl.createShader(t); gl.shaderSource(o,s); gl.compileShader(o);
+    if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(o)); return o; }
+  var prog=gl.createProgram();
+  gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs)); gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));
+  gl.linkProgram(prog); gl.useProgram(prog);
+  var buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+  var lp=gl.getAttribLocation(prog,'p'); gl.enableVertexAttribArray(lp); gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
+  var uImage=gl.getUniformLocation(prog,'uImage'), uDepth=gl.getUniformLocation(prog,'uDepth');
+  var uPointer=gl.getUniformLocation(prog,'uPointer'), uProgress=gl.getUniformLocation(prog,'uProgress');
+  var uImgA=gl.getUniformLocation(prog,'uImgA'), uCanA=gl.getUniformLocation(prog,'uCanA');
+
+  function tex(unit){ var t=gl.createTexture(); gl.activeTexture(gl.TEXTURE0+unit); gl.bindTexture(gl.TEXTURE_2D,t);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR); return t; }
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
+  var imgA=1, loaded=0, t0=Date.now();
+  function upload(img,unit){ var t=tex(unit); gl.bindTexture(gl.TEXTURE_2D,t);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img); }
+  var im=new Image(), dm=new Image();
+  function ready(){ if(++loaded<2) return; imgA=im.naturalWidth/im.naturalHeight; start(); }
+  im.onload=function(){ upload(im,0); ready(); }; dm.onload=function(){ upload(dm,1); ready(); };
+  im.src='assets/hero-image.png'; dm.src='assets/hero-depth.webp';
+
+  var px=0,py=0,tx=0,ty=0;
+  function setTarget(nx,ny){ tx=nx; ty=ny; }
+  window.addEventListener('mousemove',function(e){ setTarget((e.clientX/window.innerWidth)*2-1, -((e.clientY/window.innerHeight)*2-1)); });
+  window.addEventListener('touchmove',function(e){ if(e.touches[0]){ var t=e.touches[0]; setTarget((t.clientX/window.innerWidth)*2-1, -((t.clientY/window.innerHeight)*2-1)); } },{passive:true});
+  function resize(){ var d=Math.min(window.devicePixelRatio,1.5); var w=canvas.clientWidth||window.innerWidth, h=canvas.clientHeight||window.innerHeight;
+    canvas.width=w*d; canvas.height=h*d; gl.viewport(0,0,canvas.width,canvas.height); }
+  function start(){ gl.uniform1i(uImage,0); gl.uniform1i(uDepth,1); resize(); window.addEventListener('resize',resize);
+    (function loop(){ requestAnimationFrame(loop); var t=(Date.now()-t0)/1000;
+      var ix=Math.sin(t*0.6)*0.5, iy=Math.cos(t*0.5)*0.35;
+      var gx=tx*0.55+ix*0.9, gy=ty*0.55+iy*0.9;
+      px+=(gx-px)*0.05; py+=(gy-py)*0.05;
+      var cx=Math.max(-0.9,Math.min(0.9,px)), cy=Math.max(-0.9,Math.min(0.9,py));
+      gl.uniform2f(uPointer,cx,cy); gl.uniform1f(uProgress,Math.sin(t*0.7)*0.5+0.5);
+      gl.uniform1f(uImgA,imgA); gl.uniform1f(uCanA,canvas.width/canvas.height);
+      gl.drawArrays(gl.TRIANGLES,0,6);
+    })();
+  }
+})();
+</script>
+
+<script>
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var rotor=document.getElementById('rotor');
+  var phrases=['every scene.','every frame.','every time.','with zero drift.'];
+  if(reduce){ rotor.textContent='every time.'; }
+  else{
+    function Scr(el){this.el=el;this.ch='!<>-_\\/[]{}=+*^?#';this.update=this.update.bind(this);}
+    Scr.prototype.set=function(t){
+      var old=this.el.textContent,len=Math.max(old.length,t.length),self=this;
+      var pr=new Promise(function(r){self.resolve=r;}); this.q=[];
+      for(var i=0;i<len;i++){var s=Math.floor(Math.random()*40),e=s+Math.floor(Math.random()*40);
+        this.q.push({from:old[i]||'',to:t[i]||'',start:s,end:e});}
+      cancelAnimationFrame(this.fr); this.frame=0; this.update(); return pr;
+    };
+    Scr.prototype.update=function(){
+      var out='',done=0;
+      for(var i=0;i<this.q.length;i++){var x=this.q[i];
+        if(this.frame>=x.end){done++; out+=x.to;}
+        else if(this.frame>=x.start){
+          if(!x.char||Math.random()<0.28){x.char=this.ch[Math.floor(Math.random()*this.ch.length)];}
+          out+='<span style="-webkit-text-fill-color:#a07cff;color:#a07cff;opacity:.75">'+x.char+'</span>';
+        } else { out+=x.from; }
+      }
+      this.el.innerHTML=out;
+      if(done===this.q.length){this.resolve();}
+      else{this.fr=requestAnimationFrame(this.update); this.frame++;}
+    };
+    var sc=new Scr(rotor),pi=0;
+    (function nxt(){ sc.set(phrases[pi]).then(function(){ setTimeout(nxt,2000); }); pi=(pi+1)%phrases.length; })();
+  }
+  if('IntersectionObserver' in window){
+    var obs=new IntersectionObserver(function(es){es.forEach(function(e){
+      if(e.isIntersecting){e.target.classList.add('in'); obs.unobserve(e.target);}});},{threshold:.12});
+    document.querySelectorAll('.reveal').forEach(function(el){obs.observe(el);});
+  } else { document.querySelectorAll('.reveal').forEach(function(el){el.classList.add('in');}); }
+})();
+</script>
+</body>
+</html>
