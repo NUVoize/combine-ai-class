@@ -14,9 +14,9 @@ export function getUserId(req: Request): string | null {
     return verifyToken(token);
   }
 
-  // Dev convenience only: outside production, allow an explicit user id header so you can
-  // test the full pipeline before real auth exists. Never trusted in production.
-  if (!config.isProd) {
+  // Dev/testing convenience: allow an explicit user id header outside production, or in
+  // production only when ALLOW_DEV_AUTH=true. Remove that var at launch once real auth exists.
+  if (!config.isProd || process.env.ALLOW_DEV_AUTH === 'true') {
     return req.header('x-user-id') ?? null;
   }
 
