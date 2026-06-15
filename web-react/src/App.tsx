@@ -125,7 +125,7 @@ export default function App() {
             <div className="cb-card cb-good cb-reveal">
               <div className="cb-tag">The COMBINE workflow</div>
               <div className="cb-cap">One identity, any scene.</div>
-              <div className="cb-grid cb-grid2"><img src="/demo/locked-1.jpg" alt="Same character, scene 1" /><img src="/demo/locked-2.jpg" alt="Same character, scene 2" /></div>
+              <div className="cb-grid"><img src="/demo/locked-1.jpg" alt="Same character, studio" /><img src="/demo/locked-2.jpg" alt="Same character, evening outdoors" /><img src="/demo/locked-3.jpg" alt="Same character, mirror" /><img src="/demo/locked-4.jpg" alt="Same character, beach" /></div>
             </div>
           </div>
         </div>
