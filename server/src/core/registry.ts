@@ -1,6 +1,7 @@
 import type { ModelProfile, Medium, GenerationMode, ModeConfig } from './types';
 import { baseForMode } from './resolver';
 import { wan22 } from './profiles/wan22';
+import { krea2 } from './profiles/krea2';
 
 // Single source of truth for the model dropdown. Stubs carry correct capabilities now and
 // auto-extend the right base, so an unauthored model already runs the best-possible base.
@@ -35,6 +36,7 @@ const VIDEO_MODELS: ModelProfile[] = [
 ];
 
 const IMAGE_MODELS: ModelProfile[] = [
+  krea2, // authored from Krea's official prompting.md + expansion.txt
   stub('sd15', 'Stable Diffusion 1.5', 'image', ['txt2img', 'img2img'], 'VERIFY: expose img2img?'),
   stub('flux1dev', 'FLUX.1 dev', 'image', ['txt2img'], 'VERIFY: base is t2i; editing is a separate Kontext model.'),
   stub('flux2dev', 'FLUX.2 dev', 'image', ['txt2img', 'img2img'], 'VERIFY: FLUX.2 dev edit capability + exact name.'),
